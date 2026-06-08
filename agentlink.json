@@ -1,0 +1,18 @@
+{
+  "version": "0.33.0",
+  "mode": "new",
+  "frontend": "nextjs",
+  "supabaseCli": "2.84.0",
+  "setupHash": "b7e6ebb2",
+  "skills": [
+    "supabase/agent-skills@supabase-postgres-best-practices",
+    "supabase/server",
+    "anthropics/skills@frontend-design",
+    "shadcn/ui",
+    "vercel-labs/agent-skills@vercel-react-best-practices",
+    "resend/react-email",
+    "resend/email-best-practices",
+    "resend/resend-skills",
+    "vercel-labs/next-skills --skill next-best-practices"
+  ]
+}

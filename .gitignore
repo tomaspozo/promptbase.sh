@@ -1,0 +1,41 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+agentlink-debug.log
+
+# env files
+.env*.local
+.agentlink-progress.json
+
+# Agent Link — database backups (may contain sensitive data)
+supabase/backups/
+
+# agent skills
+*/skills/**
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
