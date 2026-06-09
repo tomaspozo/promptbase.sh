@@ -60,7 +60,7 @@ A **tenant = a workspace** (a team/project that owns a set of prompts). The scaf
 - **Brand colors:** green accent `#1D9E75` (dark `#0F6E56`), warm paper backgrounds (`#ffffff` / `#f6f6f4` light, `#1a1a18` / `#242422` dark). Follows system color scheme on the landing.
 - **Typography:** DM Mono (display headline + labels, eyebrows, code) and DM Sans (body). The hero headline is set in DM Mono, leaning into the "better than a `const`" code theme; the emphasized word (`const`) is distinguished by green color only, not italic. Self-hosted via `@fontsource`, imported in `src/routes/__root.tsx`. (Instrument Serif was trialled and dropped — too common on vibe-coded apps.)
 
-> Note: the app's auth/scaffold pages still use the default Swiss theme (Hanken Grotesk / IBM Plex Mono). The promptbase brand stack is currently scoped to the landing page. Align the editor UI to the brand stack when it's built.
+> Note: the brand palette is now the **global** shadcn/Tailwind theme — green `--primary`, warm paper backgrounds, green focus rings, and the landing's red/amber state colors live in `src/styles/globals.css` (`:root` + `.dark`), so all shadcn components on the auth/dashboard pages adopt the brand. The landing keeps its own self-contained CSS module (`landing.module.css`) but uses the same green. The auth/scaffold pages still use the Swiss *type* stack (Hanken Grotesk / IBM Plex Mono) for body/labels — only the color tokens were rebranded.
 
 ## Frontend stack
 
@@ -85,7 +85,7 @@ A **tenant = a workspace** (a team/project that owns a set of prompts). The scaf
 - Landing waitlist form is a **frontend placeholder** (localStorage). Wire it to a real backend before launch.
 - Icons: using `lucide-react` (Tabler icons from the original mockup mapped to lucide equivalents; `ti-brand-supabase` → `Database`).
 - Footer GitHub/Supabase links are placeholders pointing at the bare domains — update once the repo exists.
-- Brand fonts/colors are landing-scoped for now; promote to a shared theme when building the editor app.
+- **DONE: brand colors promoted to the global theme.** `src/styles/globals.css` `:root`/`.dark` tokens now use green `--primary` (#1d9e75), warm paper backgrounds, and green `--ring`, so auth + dashboard + all shadcn components match the landing. (Brand *fonts* are still landing-scoped; the app body uses the Swiss type stack.) Radius left at 2px (auth inputs hardcode `rounded-[2px]`); bump `--radius` later if you want the landing's softer 8px feel app-wide.
 - **DONE: migrated the frontend from Next.js to TanStack Start (SSR)** — see the "Frontend stack" section above. App code moved under `src/`; Next.js/PostCSS removed. Env vars renamed `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` → `VITE_SUPABASE_URL`/`VITE_SUPABASE_PUBLISHABLE_KEY` (update `.env.local`). The protected dashboard route is now `/dashboard` (was `/protected`).
 - `agentlink.json` still reads `"frontend": "nextjs"` — **stale but intentionally left as-is.** agentlink's managed resources are backend SQL/config (`@agentlink`-annotated), not frontend files, so `--force-update` won't touch the hand-rolled Start frontend. Don't let the field mislead you: the frontend is TanStack Start.
 - Lint uses a minimal flat config (TS parser, no rule set) since the Next eslint preset was removed; `vite build` is the real gate. Tighten with `typescript-eslint` recommended rules later if desired.
