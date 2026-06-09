@@ -9,6 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { NotFound } from "@/components/not-found";
 import globalCss from "@/styles/globals.css?url";
 
 // Brand type stack, self-hosted via @fontsource (replaces next/font):
@@ -45,6 +46,7 @@ export const Route = createRootRoute({
     ],
     links: [{ rel: "stylesheet", href: globalCss }],
   }),
+  notFoundComponent: NotFound,
   component: RootComponent,
 });
 
