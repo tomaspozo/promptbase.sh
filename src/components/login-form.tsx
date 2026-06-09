@@ -67,7 +67,7 @@ export function LoginForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 rounded-[2px]"
+            className="h-11 rounded-md"
           />
         </div>
 
@@ -82,7 +82,7 @@ export function LoginForm({
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 rounded-[2px]"
+              className="h-11 rounded-md"
             />
           </div>
         )}

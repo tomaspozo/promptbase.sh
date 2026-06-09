@@ -227,7 +227,7 @@ function InviteForm({
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-11 rounded-[2px]"
+          className="h-11 rounded-md"
         />
       </div>
       <div className="space-y-2">
@@ -395,7 +395,7 @@ function RoleSelect({
       value={current}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className="h-11 rounded-[2px] border border-input bg-background px-3 text-sm"
+      className="h-11 rounded-md border border-input bg-background px-3 text-sm"
     >
       {ROLES.map((r) => (
         <option key={r} value={r}>

@@ -4,9 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* Self-hosted via @fontsource (imported in src/routes/__root.tsx) */
-  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  /* promptbase brand type — DM Sans body, DM Mono labels/code (matches the
+     landing). Self-hosted via @fontsource (imported in src/routes/__root.tsx). */
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -80,7 +81,7 @@
   --input: #d8d7d1;
   --ring: #1d9e75;
 
-  --radius: 0.125rem; /* 2px — precise, not rounded, not brutalist */
+  --radius: 0.625rem; /* 10px — rounded-md resolves to 8px, matching the landing */
 
   --chart-1: var(--up);
   --chart-2: var(--mid);

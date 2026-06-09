@@ -11,14 +11,11 @@ import type { ReactNode } from "react";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import globalCss from "@/styles/globals.css?url";
 
-// Brand + Swiss type stacks, self-hosted via @fontsource (replaces next/font).
-import "@fontsource-variable/hanken-grotesk";
+// Brand type stack, self-hosted via @fontsource (replaces next/font):
+// DM Sans for body, DM Mono for labels/code — used app-wide and on the landing.
 import "@fontsource-variable/dm-sans";
 import "@fontsource/dm-mono/400.css";
 import "@fontsource/dm-mono/500.css";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
-import "@fontsource/ibm-plex-mono/600.css";
 
 // Reads the session from the request cookies during SSR (and on the server
 // during client navigations). Returns the decoded JWT claims or null. The

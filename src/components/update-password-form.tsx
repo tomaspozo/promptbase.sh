@@ -46,7 +46,7 @@ export function UpdatePasswordForm({
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 rounded-[2px]"
+            className="h-11 rounded-md"
             autoFocus
           />
         </div>
@@ -60,7 +60,7 @@ export function UpdatePasswordForm({
             minLength={6}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="h-11 rounded-[2px]"
+            className="h-11 rounded-md"
           />
         </div>
 

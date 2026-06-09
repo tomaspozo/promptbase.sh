@@ -112,7 +112,7 @@ export function CheckInboxCard({
                   setCode(next);
                   if (verify.error) verify.setError(null);
                 }}
-                className="h-12 rounded-[2px] text-center font-mono text-lg tracking-[0.35em]"
+                className="h-12 rounded-md text-center font-mono text-lg tracking-[0.35em]"
                 autoFocus
               />
             </div>

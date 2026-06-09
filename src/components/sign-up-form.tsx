@@ -59,7 +59,7 @@ export function SignUpForm({
             maxLength={100}
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="h-11 rounded-[2px]"
+            className="h-11 rounded-md"
           />
         </div>
         <div className="grid gap-2">
@@ -72,7 +72,7 @@ export function SignUpForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 rounded-[2px]"
+            className="h-11 rounded-md"
           />
         </div>
         <div className="grid gap-2">
@@ -85,7 +85,7 @@ export function SignUpForm({
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 rounded-[2px]"
+            className="h-11 rounded-md"
           />
         </div>
         <div className="grid gap-2">
@@ -100,7 +100,7 @@ export function SignUpForm({
             maxLength={100}
             value={organizationName}
             onChange={(e) => setOrganizationName(e.target.value)}
-            className="h-11 rounded-[2px]"
+            className="h-11 rounded-md"
           />
         </div>
 
