@@ -28,7 +28,7 @@ export interface EmailLayoutProps {
 /**
  * Full email document for transactional emails.
  *
- * Mirrors the frontend's Swiss-minimalist chrome:
+ * Mirrors the frontend's brand chrome:
  *   ┌──────────────────────────────────────┐
  *   │  AppName            CONFIRM EMAIL    │  ← brand left, mono label right
  *   ├──────────────────────────────────────┤  ← hairline rule
@@ -44,10 +44,10 @@ export interface EmailLayoutProps {
  *   </EmailLayout>
  *
  * Brand text comes from the APP_NAME environment variable; defaults to
- * "App". Hanken Grotesk + IBM Plex Mono are loaded via React Email's
- * Font component so clients that support web fonts (Apple Mail, Gmail
- * web) match the website's type stack. Other clients fall back to the
- * stack defined in styles.ts.
+ * "App". DM Sans + DM Mono are loaded via React Email's Font component so
+ * clients that support web fonts (Apple Mail, Gmail web) match the
+ * promptbase brand type stack. Other clients fall back to the stack
+ * defined in styles.ts.
  */
 export function EmailLayout({
   children,
@@ -61,33 +61,43 @@ export function EmailLayout({
     <Html lang={lang}>
       <Head>
         <Font
-          fontFamily="Hanken Grotesk"
+          fontFamily="DM Sans"
           fallbackFontFamily="Helvetica"
           webFont={{
-            url: 'https://fonts.gstatic.com/s/hankengrotesk/v8/ieVq2YZDLWuGJpnzaiwFXS9tYvBRz4QWY1g.woff2',
+            url: 'https://fonts.gstatic.com/s/dmsans/v17/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K6z9mXg.woff2',
             format: 'woff2',
           }}
           fontWeight={400}
           fontStyle="normal"
         />
         <Font
-          fontFamily="Hanken Grotesk"
+          fontFamily="DM Sans"
           fallbackFontFamily="Helvetica"
           webFont={{
-            url: 'https://fonts.gstatic.com/s/hankengrotesk/v8/ieVq2YZDLWuGJpnzaiwFXS9tWfFRz4QWY1g.woff2',
+            url: 'https://fonts.gstatic.com/s/dmsans/v17/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K6z9mXg.woff2',
             format: 'woff2',
           }}
           fontWeight={500}
           fontStyle="normal"
         />
         <Font
-          fontFamily="IBM Plex Mono"
+          fontFamily="DM Mono"
           fallbackFontFamily="monospace"
           webFont={{
-            url: 'https://fonts.gstatic.com/s/ibmplexmono/v19/-F63fjptAgt5VM-kVkqdyU8n5igg1l9kn-s.woff2',
+            url: 'https://fonts.gstatic.com/s/dmmono/v16/aFTU7PB1QTsUX8KYthqQBK6PYK0.woff2',
             format: 'woff2',
           }}
           fontWeight={400}
+          fontStyle="normal"
+        />
+        <Font
+          fontFamily="DM Mono"
+          fallbackFontFamily="monospace"
+          webFont={{
+            url: 'https://fonts.gstatic.com/s/dmmono/v16/aFTR7PB1QTsUX8KYvumzEYOtbYf-Vlg.woff2',
+            format: 'woff2',
+          }}
+          fontWeight={500}
           fontStyle="normal"
         />
       </Head>

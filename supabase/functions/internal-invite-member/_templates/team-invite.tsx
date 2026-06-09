@@ -2,7 +2,7 @@ import * as React from 'npm:react@18.3.1'
 import { Heading, Text } from 'npm:@react-email/components@0.0.22'
 import { EmailLayout } from '../../_shared/email-components/layout.tsx'
 import { EmailButton } from '../../_shared/email-components/button.tsx'
-import { typography } from '../../_shared/email-components/styles.ts'
+import { colors, typography } from '../../_shared/email-components/styles.ts'
 
 export interface TeamInviteEmailProps {
   inviteUrl: string
@@ -31,7 +31,7 @@ export function TeamInviteEmail({
       </Heading>
       <Text style={typography.text}>
         You&rsquo;ve been invited to join{' '}
-        <strong style={{ color: '#0a0a0a' }}>{tenantName}</strong> on{' '}
+        <strong style={{ color: colors.text }}>{tenantName}</strong> on{' '}
         {appName}. Click the button below to accept the invitation.
       </Text>
       <EmailButton href={inviteUrl}>Accept invitation →</EmailButton>

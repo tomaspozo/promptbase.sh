@@ -11,9 +11,9 @@ export interface EmailButtonProps {
 }
 
 /**
- * Solid near-black CTA with 2px radius — matches the website's primary
- * button. Wrapped in a Section so the button always sits on its own line
- * with consistent vertical breathing room.
+ * Solid green CTA with 8px radius — matches the website's primary button.
+ * Wrapped in a Section so the button always sits on its own line with
+ * consistent vertical breathing room.
  */
 export function EmailButton({
   href,

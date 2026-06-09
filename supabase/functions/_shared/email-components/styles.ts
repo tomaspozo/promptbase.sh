@@ -1,9 +1,9 @@
 /**
  * Shared style tokens for email templates.
  *
- * Mirrors the website's Swiss-minimalist design system (see src/index.css):
- * Hanken Grotesk + IBM Plex Mono, near-black on paper, hairline borders,
- * 2px radius, mono uppercase labels with wide tracking.
+ * Mirrors the promptbase brand (see src/styles/globals.css and the landing):
+ * DM Sans + DM Mono, green primary on warm paper, hairline borders, 8px
+ * radius, mono uppercase labels with wide tracking.
  *
  * Customize: agents change tokens directly here. Touch `colors.primary` and
  * `fontFamily.sans` first if you want a quick brand pass.
@@ -11,25 +11,25 @@
 
 export const colors = {
   // Surfaces
-  background: '#fbfbfa', // paper
+  background: '#f6f6f4', // warm paper behind the card
   surface: '#ffffff', // card
   // Foreground
-  text: '#0a0a0a', // near-black
-  textMuted: '#6b6b6b', // muted-foreground
-  textLight: '#a3a3a3',
+  text: '#1a1a18', // warm near-black
+  textMuted: '#5f5e5a', // muted-foreground
+  textLight: '#9a9892',
   // Lines
-  border: '#e5e5e5', // hairline
+  border: '#e7e6e1', // hairline
   // Action
-  primary: '#0a0a0a', // near-black (matches website default)
-  primaryForeground: '#fbfbfa',
+  primary: '#1d9e75', // brand green
+  primaryForeground: '#ffffff',
 } as const
 
 export const fontFamily = {
-  sans: "'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
-  mono: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+  sans: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+  mono: "'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 } as const
 
-const RADIUS = '2px'
+const RADIUS = '8px'
 
 export const layout = {
   main: {
@@ -131,7 +131,7 @@ export const typography = {
   },
 } as const
 
-// Solid near-black button with 2px radius — matches the website's primary CTA.
+// Solid green button with 8px radius — matches the website's primary CTA.
 export const button = {
   display: 'inline-block',
   padding: '12px 22px',
