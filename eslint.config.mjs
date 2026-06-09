@@ -1,16 +1,23 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+// Flat config for the TanStack Start app (Next.js presets removed during the
+// migration). Uses the TypeScript parser so .ts/.tsx parse cleanly; rules are
+// intentionally light — `vite build` is the real correctness gate.
+import tseslint from "typescript-eslint";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+export default [
+  {
+    ignores: [
+      "node_modules",
+      "dist",
+      ".output",
+      ".tanstack",
+      "src/routeTree.gen.ts",
+    ],
+  },
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+  },
 ];
-
-export default eslintConfig;
