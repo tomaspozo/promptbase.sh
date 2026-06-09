@@ -12,12 +12,13 @@ import { useSignUpFlow } from "@/lib/auth";
  * the OTP, click the email link, or resend).
  */
 export function SignUpForm({
+  defaultEmail,
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: { defaultEmail?: string } & React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(defaultEmail ?? "");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [organizationName, setOrganizationName] = useState("");

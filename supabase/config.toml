@@ -80,3 +80,7 @@ verify_jwt = false
 [functions.internal-invite-member]
 enabled = true
 verify_jwt = false
+
+[functions.internal-send-approval-email]
+enabled = true
+verify_jwt = false

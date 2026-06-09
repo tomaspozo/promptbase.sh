@@ -47,6 +47,18 @@ export function readPermissions(accessToken: string | undefined): string[] {
   return permissionsFromClaims(decodeJwtPayload(accessToken));
 }
 
+/**
+ * Early-access waitlist gate. Reads `app_metadata.allowed` from the decoded
+ * JWT claims (injected by public._hook_custom_access_token). Fails safe to
+ * `false` so a missing/old claim keeps the user on the waitlist rather than
+ * leaking the app. UX only — the backend RPC guards remain the real gate.
+ */
+export function isAllowedFromClaims(
+  claims: Record<string, any> | null | undefined,
+): boolean {
+  return claims?.app_metadata?.allowed === true;
+}
+
 export function hasPermission(held: string[], required: string): boolean {
   return held.includes(required);
 }

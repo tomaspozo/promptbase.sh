@@ -111,38 +111,13 @@ BEGIN
 END;
 $$;
 
--- @agentlink _internal_admin_handle_new_user
--- @type function
--- @summary Creates profile and (for direct signups without pending invites) default tenant
--- @description Trigger function that fires after INSERT on auth.users. Always creates
---   a profile row. For direct signups, ALSO creates a personal tenant (workspace) and
---   an owner membership — UNLESS the user has a pending workspace invitation, in which
---   case the personal tenant is skipped (the user will accept the invite via
---   api.invitation_accept and join the inviter's tenant; creating a parallel personal
---   tenant would surprise them and leave dead workspaces around).
---
---   Three skip-personal-tenant paths:
---     1. NEW.invited_at IS NOT NULL — user was created via auth.admin.generateLink
---        ({ type: 'invite' }) or auth.admin.inviteUserByEmail. Original "admin invited
---        you to the app" flow.
---     2. A pending invitation matches NEW.email — the user is mid-flight in the
---        redesigned /accept-invite flow, which calls signUp() (so invited_at IS NULL)
---        but expects to join the invited tenant once they confirm their email.
---     3. (Implicit) The COALESCE chain falls back to "{display_name}'s Workspace"
---        when raw_user_meta_data->>'organization_name' is NULL — OAuth signups still
---        get a sensible default tenant name.
---
---   Email comparison is case-insensitive (lower()) on both sides — auth.users.email
---   is normalized but invitations.email isn't, so we normalize at compare time.
---
---   No JWT claim writes — _hook_custom_access_token reads memberships at every JWT
---   mint and auto-selects the user's oldest membership when no per-session pin exists.
---   For users skipped here, the membership comes from the subsequent invitation_accept
---   call, and the next refresh mints a JWT with the right tenant_id.
--- @signature _internal_admin_handle_new_user()
--- @returns trigger
--- @security SECURITY DEFINER — required because it reads from auth.users which RLS can't access
--- @related profiles, tenants, memberships, invitations, trg_auth_users_new_user, _hook_custom_access_token, api.invitation_accept
+-- PROJECT-OWNED OVERRIDE (no @agentlink annotation): customized for the
+-- early-access waitlist. Fires after INSERT on auth.users. Always creates a
+-- profile row; for direct signups also creates a personal tenant + owner
+-- membership (unless the user has a pending workspace invite). Waitlist
+-- customization: invited users bypass the waitlist (profiles.allowed = true);
+-- organic signups start not-allowed (column default) until manual approval.
+-- SECURITY DEFINER — required because it reads from auth.users which RLS can't access.
 CREATE OR REPLACE FUNCTION public._internal_admin_handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -169,8 +144,21 @@ BEGIN
   -- forms that don't collect it — fall back to the auto-generated name).
   v_organization_name := NULLIF(trim(NEW.raw_user_meta_data->>'organization_name'), '');
 
-  -- Create profile (always — every user needs one)
-  INSERT INTO public.profiles (id, email, display_name, avatar_url)
+  -- A pending invite means the user is intentionally being routed to an
+  -- existing workspace; don't auto-create a parallel personal one. Computed
+  -- before the profile INSERT so it can also drive the waitlist `allowed` flag.
+  v_has_pending_invite := EXISTS (
+    SELECT 1 FROM public.invitations
+    WHERE lower(email) = lower(NEW.email)
+      AND accepted_at IS NULL
+      AND expires_at > now()
+  );
+
+  -- Create profile (always — every user needs one). Waitlist gate: invited
+  -- users (admin-invited via invited_at, or with a pending workspace invite)
+  -- bypass the waitlist (allowed = true). Organic signups fall through to the
+  -- column default (allowed = false) and wait for manual approval.
+  INSERT INTO public.profiles (id, email, display_name, avatar_url, allowed)
   VALUES (
     NEW.id,
     NEW.email,
@@ -178,16 +166,8 @@ BEGIN
     COALESCE(
       NEW.raw_user_meta_data->>'avatar_url',
       NEW.raw_user_meta_data->>'picture'
-    )
-  );
-
-  -- A pending invite means the user is intentionally being routed to an
-  -- existing workspace; don't auto-create a parallel personal one.
-  v_has_pending_invite := EXISTS (
-    SELECT 1 FROM public.invitations
-    WHERE lower(email) = lower(NEW.email)
-      AND accepted_at IS NULL
-      AND expires_at > now()
+    ),
+    (NEW.invited_at IS NOT NULL OR v_has_pending_invite)
   );
 
   -- Skip personal tenant creation for two reasons:

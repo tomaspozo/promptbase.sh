@@ -1,29 +1,11 @@
--- @agentlink _hook_custom_access_token
--- @type function
--- @summary Auth hook that injects tenant_id, tenant_role, and permissions into the JWT
--- @description Fires on every JWT mint (sign-in and refresh). Resolves the tenant
---   for this device's session in two passes:
---     1. session_tenants pin — set by api.tenant_select when the user picks a tenant.
---        Keyed on session_id (one row per device/login), so switching on phone never
---        moves the laptop's selection.
---     2. Fallback — if no pin exists, picks the user's oldest membership. This makes
---        single-tenant apps "just work": after signup the hook auto-selects the only
---        membership, and after invitation acceptance the hook picks up the new one
---        on next refresh. No client-side tenant_select call required.
---   Once resolved, populates app_metadata.tenant_id, app_metadata.tenant_role, and
---   app_metadata.permissions (from role_permissions). Server-side helpers
---   (_auth_tenant_id, _auth_tenant_role, _auth_has_role, _auth_has_permission)
---   read from these claims via auth.jwt(). Client-side: decode session.access_token
---   directly — user.app_metadata is the database row (auth.users.raw_app_meta_data),
---   NOT the JWT, and stays empty in this scaffold.
--- @signature _hook_custom_access_token(event jsonb)
--- @returns jsonb
--- @security SECURITY DEFINER — runs as the function owner (postgres) so reads
---   against public.session_tenants / public.memberships / public.role_permissions
---   succeed without needing per-table SELECT grants and RLS policies for
---   supabase_auth_admin. Privilege escalation is bounded by the REVOKE+GRANT pair
---   below: only supabase_auth_admin can invoke it.
--- @related session_tenants, memberships, role_permissions, _auth_has_permission, auth.hook.custom_access_token
+-- PROJECT-OWNED OVERRIDE (no @agentlink annotation): customized for the
+-- early-access waitlist. Fires on every JWT mint (sign-in and refresh).
+-- Resolves the active tenant (session pin → oldest membership fallback) and
+-- injects app_metadata.tenant_id / tenant_role / permissions, PLUS
+-- app_metadata.allowed (from profiles.allowed) so the frontend _auth gate can
+-- route not-allowed users to /pending. SECURITY DEFINER — runs as the owner so
+-- reads against public.* succeed for supabase_auth_admin; the REVOKE+GRANT pair
+-- below bounds invocation to supabase_auth_admin only.
 CREATE OR REPLACE FUNCTION public._hook_custom_access_token(event jsonb)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -40,6 +22,7 @@ DECLARE
   v_tenant_id        uuid;
   v_tenant_role      text;
   v_permissions      text[];
+  v_allowed          boolean := false;
   v_claim            text;
 BEGIN
   -- Safe parse: malformed/missing UUIDs collapse to NULL instead of erroring
@@ -108,7 +91,7 @@ BEGIN
   -- set (e.g. provider data) — we just want OUR three keys to be the
   -- authoritative source from the resolution above, not whatever was
   -- baked in previously.
-  v_app_meta := v_app_meta - 'tenant_id' - 'tenant_role' - 'permissions';
+  v_app_meta := v_app_meta - 'tenant_id' - 'tenant_role' - 'permissions' - 'allowed';
 
   IF v_tenant_id IS NOT NULL THEN
     SELECT array_agg(permission_name)
@@ -122,6 +105,13 @@ BEGIN
       'permissions', COALESCE(to_jsonb(v_permissions), '[]'::jsonb)
     );
   END IF;
+
+  -- Waitlist gate: surface profiles.allowed on every mint, independent of
+  -- tenant resolution (a user may be allowed before any tenant is selected).
+  IF v_user_id IS NOT NULL THEN
+    SELECT allowed INTO v_allowed FROM public.profiles WHERE id = v_user_id;
+  END IF;
+  v_app_meta := v_app_meta || jsonb_build_object('allowed', COALESCE(v_allowed, false));
 
   v_new_claims := jsonb_set(v_new_claims, '{app_metadata}', v_app_meta);
 
