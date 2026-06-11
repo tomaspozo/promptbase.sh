@@ -50,13 +50,35 @@ Run `supabase status` to get the local API URL, DB URL, publishable key, and sec
 
 **Deferred / explicitly out of scope:** observability, evals, conversation/thread management, tool registries.
 
+## Architecture (how it actually works)
+
+**Prompts live in the user's OWN Supabase project, not ours.** The platform database stores only **metadata** (accounts, orgs, workspaces, environments). Prompt content is never stored on our servers — that's the "you own it" guarantee.
+
+**Hierarchy:** User → **Organization** (1 per connected Supabase org; holds the OAuth tokens in Vault) → **Workspace** (= a scaffolded `tenant`, gains `organization_id` + `plan`; the unit of billing + membership) → **Environment** (1 per real Supabase project) → **Prompts / versions** (live in that project, in a deployed `promptbase` schema).
+
+**One-click install** (`supabase/functions/environment-install`): using the org's OAuth token + the Supabase Management API — run the migration (`promptbase` schema + `prompts`/`prompt_versions`), expose the schema to PostgREST, set a dedicated **`PROMPTBASE_SECRET`** function-secret, deploy the two edge functions, then **verify end-to-end** (publish→fetch→delete a healthcheck prompt) before recording the environment. No CLI — it's all OAuth + Management API.
+
+**Deployed edge functions (in the user's project), templated under `supabase/functions/_templates/promptbase/`:**
+
+- `promptbase-manage` — prompt CRUD (`list/get/create/save_draft/publish/unpublish/delete/upsert_published`).
+- `promptbase-get` — runtime read of the published version by slug (the developer's app calls this; helper in `_shared/promptbase.ts`).
+- Both use `auth: "none"` + a manual timing-safe check of the `x-promptbase-key` header against `PROMPTBASE_SECRET`. (`@supabase/server`'s `auth: "secret"` only matches the project's *default* secret key, so a custom key can't validate — hence the manual check.)
+
+**The proxy** (`supabase/functions/prompts-proxy`, `auth: "user"`): the browser never holds env secrets. Browser → proxy → membership check → reads the env secret from Vault (`_admin_environment_proxy`) → calls the env's `promptbase-manage` with `x-promptbase-key`. The proxy also stamps `created_by` (the caller's display name from `profile_get`) onto version-creating actions.
+
+**Draft / version model:** a **draft** is a single mutable working copy stored on the prompt (`draft_*` columns), overwritten on each *Save draft*, never versioned. **Versions** are immutable snapshots created only on *Publish*; History lists publishes (vN · date · by who). **Promote** copies a published version into another environment (`upsert_published`).
+
+**Versioning the templates:** each env records `promptbase_version`; the UI flags "update available" when it differs from `PROMPTBASE_VERSION` (`src/lib/promptbase-version.ts`, mirrors `_templates/promptbase/VERSION`). Re-deploy re-runs the migration — `CREATE TABLE IF NOT EXISTS` is skipped for existing tables, so schema changes use idempotent `ALTER … ADD COLUMN IF NOT EXISTS`. Bump VERSION + `python3 scripts/gen-promptbase-templates.py` whenever a template changes.
+
+**Plan gating:** `tenants.plan` (`free` | `pro`). Free = 1 owned workspace per account; `api.tenant_create` enforces it (raises with `HINT = 'plan_limit'`), and the WorkspaceSwitcher mirrors the gate + opens an upgrade dialog. MVP has no billing, so `api.tenant_upgrade` just flips the workspace to `pro`.
+
 ## Multi-tenancy
 
-A **tenant = a workspace** (a team/project that owns a set of prompts). The scaffolded `tenants` + `memberships` + `invitations` tables are kept. Prompts, prompt versions, and variables are all **tenant-scoped** — isolation enforced by RLS on `tenant_id`, permission/action authz via RPC guards. Team editing (the core value prop) maps directly onto memberships/invitations.
+A **workspace = a scaffolded `tenant`**. The `tenants` + `memberships` + `invitations` tables are kept; workspaces gain `organization_id` + `plan`. **Prompts are NOT in the platform DB** — they live per-environment in the user's project, so isolation there is the deployed `PROMPTBASE_SECRET` + the platform's membership check in the proxy. Platform-side metadata (orgs/environments) is tenant-scoped via RLS on `tenant_id`; permission/action authz is via RPC `auth_verify_access()` guards. The active workspace is pinned to the session (`tenant_select` / claims); switching re-mints the JWT (`refreshSession()`).
 
 ## Look & feel
 
-- **Entry point:** public-facing. `/` is a marketing **landing page** whose "Get early access" form starts the **sign-up** flow (early-access waitlist — see the Early-access waitlist section). The gated app lives behind auth at `/dashboard`. Landing is implemented at `src/routes/index.tsx` with scoped styles in `src/styles/landing.module.css`.
+- **Entry point:** public-facing. `/` is a marketing **landing page** whose "Get early access" form starts the **sign-up** flow (early-access waitlist — see the Early-access waitlist section), plus a top-right **Log in** link to `/auth/sign-in`. The gated app lives behind auth: the post-login resolver `/app` redirects to the active workspace at **`/$slug`**; every workspace page shares a sticky top bar (workspace switcher + account menu) and the standard `PageHeader` (`src/components/page-header.tsx`). Landing is `src/routes/index.tsx` with scoped styles in `src/styles/landing.module.css`.
 - **Brand colors:** green accent `#1D9E75` (dark `#0F6E56`), warm paper backgrounds (`#ffffff` / `#f6f6f4` light, `#1a1a18` / `#242422` dark). Follows system color scheme on the landing.
 - **Typography:** DM Mono (display headline + labels, eyebrows, code) and DM Sans (body). The hero headline is set in DM Mono, leaning into the "better than a `const`" code theme; the emphasized word (`const`) is distinguished by green color only, not italic. Self-hosted via `@fontsource`, imported in `src/routes/__root.tsx`. (Instrument Serif was trialled and dropped — too common on vibe-coded apps.)
 
@@ -87,17 +109,24 @@ Sign-up is gated by a manual approval step. New users sign up + verify their ema
 
 ## Main entities
 
-- **prompt** — a named, tenant-scoped prompt (e.g. `onboarding-email`). Has a slug/key, optional description.
-- **prompt_version** — an immutable revision of a prompt's system + user template, with publish state (draft/published) enabling history & rollback.
-- **variable** — the `{{variables}}` a prompt template expects; values supplied at runtime.
-- **tenant / membership / invitation** — scaffolded; a tenant is a workspace, members edit prompts.
-- **early-access / `profiles.allowed`** — the waitlist is now a real sign-up + manual approval gate (see the Early-access waitlist section), not a localStorage capture.
+Platform DB (metadata only):
+
+- **organization** — one per connected Supabase org; owner-scoped; holds the OAuth access/refresh tokens (in Vault). `public/organizations.sql`.
+- **workspace / tenant / membership / invitation** — scaffolded; a workspace = a tenant (gains `organization_id` + `plan`); members edit prompts. Billing + access boundary.
+- **environment** — one per real Supabase project a workspace deploys into; tenant-scoped; stores the project ref/URL, the Vault `secret_id`, `installed`, and `promptbase_version`. `public/environments.sql`.
+- **early-access / `profiles.allowed`** — real sign-up + manual approval gate (see the Early-access waitlist section).
+
+In the user's OWN project (the `promptbase` schema deployed by install — never in the platform DB):
+
+- **prompt** — a named prompt (slug/key, optional description) + its **draft** working copy (`draft_*` columns).
+- **prompt_version** — an immutable publish snapshot (system + user template + variables + `created_by`); one is live (`is_published`). History & rollback.
+- **variable** — the `{{variables}}` a template expects; values supplied at runtime by the developer's app.
 
 ## Decisions to track
 
 - **DONE: waitlist is a real sign-up + approval gate** (`profiles.allowed`, see Early-access waitlist section). Approval is manual via Supabase Studio for now; a future admin UI (`/admin/waitlist` + `waitlist.approve` permission) could replace the manual SQL.
 - Icons: using `lucide-react` (Tabler icons from the original mockup mapped to lucide equivalents; `ti-brand-supabase` → `Database`).
-- Footer GitHub/Supabase links are placeholders pointing at the bare domains — update once the repo exists.
+- Footer now credits **Built by [tomaspozo](https://x.com/tomaspozo) with [agentlink.sh](https://agentlink.sh)** (replaced the placeholder GitHub/Supabase links).
 - **DONE: full brand promoted to the global theme** (`src/styles/globals.css`): green `--primary` (#1d9e75) + green `--ring`, warm paper backgrounds, landing red/amber state colors, **DM Sans body + DM Mono labels**, and 8px radius (`--radius: 0.625rem`). Hardcoded `rounded-[2px]` overrides removed from the auth forms (they use `rounded-md` now). Hanken Grotesk + IBM Plex Mono `@fontsource` deps removed. Auth + dashboard now match the landing pixel-for-pixel on fonts/radius/colors.
 - **DONE: migrated the frontend from Next.js to TanStack Start (SSR)** — see the "Frontend stack" section above. App code moved under `src/`; Next.js/PostCSS removed. Env vars renamed `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` → `VITE_SUPABASE_URL`/`VITE_SUPABASE_PUBLISHABLE_KEY` (update `.env.local`). The protected dashboard route is now `/dashboard` (was `/protected`).
 - `agentlink.json` still reads `"frontend": "nextjs"` — **stale but intentionally left as-is.** agentlink's managed resources are backend SQL/config (`@agentlink`-annotated), not frontend files, so `--force-update` won't touch the hand-rolled Start frontend. Don't let the field mislead you: the frontend is TanStack Start.

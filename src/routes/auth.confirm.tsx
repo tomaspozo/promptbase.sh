@@ -24,10 +24,10 @@ const exchangeCode = createServerFn({ method: "GET" })
       return { to: "/auth/sign-in" };
     }
     if (data.type === "recovery") return { to: "/update-password" };
-    if (data.type === "email_change") return { to: "/dashboard" };
+    if (data.type === "email_change") return { to: "/app" };
     // signup / magiclink / fallback — the session cookie now carries the
     // tenant_id claim populated by _hook_custom_access_token on this mint.
-    return { to: data.next ?? "/dashboard" };
+    return { to: data.next ?? "/app" };
   });
 
 export const Route = createFileRoute("/auth/confirm")({

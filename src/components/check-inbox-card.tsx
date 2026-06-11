@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,9 +87,7 @@ export function CheckInboxCard({
         </div>
 
         <div className="mt-12 animate-rise">
-          <h1 className="text-3xl font-medium tracking-[-0.02em] sm:text-4xl">
-            {copy.title}
-          </h1>
+          <PageHeading>{copy.title}</PageHeading>
           <p className="mt-2 text-sm text-muted-foreground">
             We sent an email to{" "}
             <span className="font-mono text-foreground">{email}</span>.{" "}
@@ -120,7 +119,7 @@ export function CheckInboxCard({
             {error && (
               <p
                 role="alert"
-                className="border border-[color:var(--down)]/30 bg-[color:var(--down)]/5 px-3 py-2 font-mono text-xs text-[color:var(--down)]"
+                className="callout-error"
               >
                 {error}
               </p>
@@ -129,7 +128,7 @@ export function CheckInboxCard({
             <Button
               type="submit"
               disabled={verify.loading || code.length !== 8}
-              className="h-11 w-full"
+              className="h-10 w-full"
             >
               {verify.loading ? "Verifying…" : copy.cta}
             </Button>

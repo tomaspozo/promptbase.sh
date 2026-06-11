@@ -41,7 +41,7 @@ export function ForgotPasswordForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
             autoFocus
           />
         </div>
@@ -49,13 +49,13 @@ export function ForgotPasswordForm({
         {reset.error && (
           <p
             role="alert"
-            className="border border-[color:var(--down)]/30 bg-[color:var(--down)]/5 px-3 py-2 font-mono text-xs text-[color:var(--down)]"
+            className="callout-error"
           >
             {reset.error}
           </p>
         )}
 
-        <Button type="submit" disabled={reset.loading} className="h-11 w-full">
+        <Button type="submit" disabled={reset.loading} className="h-10 w-full">
           {reset.loading ? "Sending…" : "Send reset email"}
         </Button>
 

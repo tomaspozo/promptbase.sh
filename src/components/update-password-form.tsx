@@ -29,7 +29,7 @@ export function UpdatePasswordForm({
     const ok = await flow.submit(password);
     if (ok) {
       await router.invalidate();
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/app" });
     }
   }
 
@@ -46,7 +46,7 @@ export function UpdatePasswordForm({
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
             autoFocus
           />
         </div>
@@ -60,20 +60,20 @@ export function UpdatePasswordForm({
             minLength={6}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
           />
         </div>
 
         {flow.error && (
           <p
             role="alert"
-            className="border border-[color:var(--down)]/30 bg-[color:var(--down)]/5 px-3 py-2 font-mono text-xs text-[color:var(--down)]"
+            className="callout-error"
           >
             {flow.error}
           </p>
         )}
 
-        <Button type="submit" disabled={flow.loading} className="h-11 w-full">
+        <Button type="submit" disabled={flow.loading} className="h-10 w-full">
           {flow.loading ? "Saving…" : "Save and continue"}
         </Button>
       </form>

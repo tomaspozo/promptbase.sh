@@ -41,7 +41,7 @@ export function SignUpForm({
       });
     } else {
       await router.invalidate();
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/app" });
     }
   }
 
@@ -60,7 +60,7 @@ export function SignUpForm({
             maxLength={100}
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
           />
         </div>
         <div className="grid gap-2">
@@ -73,7 +73,7 @@ export function SignUpForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
           />
         </div>
         <div className="grid gap-2">
@@ -86,7 +86,7 @@ export function SignUpForm({
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
           />
         </div>
         <div className="grid gap-2">
@@ -101,20 +101,20 @@ export function SignUpForm({
             maxLength={100}
             value={organizationName}
             onChange={(e) => setOrganizationName(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
           />
         </div>
 
         {signUp.error && (
           <p
             role="alert"
-            className="border border-[color:var(--down)]/30 bg-[color:var(--down)]/5 px-3 py-2 font-mono text-xs text-[color:var(--down)]"
+            className="callout-error"
           >
             {signUp.error}
           </p>
         )}
 
-        <Button type="submit" disabled={signUp.loading} className="h-11 w-full">
+        <Button type="submit" disabled={signUp.loading} className="h-10 w-full">
           {signUp.loading ? "Creating account…" : "Create account"}
         </Button>
 

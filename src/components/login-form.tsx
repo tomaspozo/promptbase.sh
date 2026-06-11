@@ -12,7 +12,7 @@ type Mode = "password" | "magic_link";
  * `!data.session` and `refreshSession` logic stays consistent with the
  * sign-up flow.
  *
- * On success: navigates to the `next` prop if present, else /dashboard.
+ * On success: navigates to the `next` prop if present, else /app.
  * For magic-link mode: navigates to /auth/check-inbox?type=magiclink&email=…
  */
 export function LoginForm({
@@ -38,7 +38,7 @@ export function LoginForm({
         // Refresh root context (reads the new session cookie) before entering
         // a gated route, otherwise the _auth gate sees a stale null user.
         await router.invalidate();
-        navigate({ to: next ?? "/dashboard" });
+        navigate({ to: next ?? "/app" });
       }
     } else {
       const ok = await magicLinkFlow.submit({ email });
@@ -67,7 +67,7 @@ export function LoginForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 rounded-md"
+            className="h-10 rounded-md"
           />
         </div>
 
@@ -82,7 +82,7 @@ export function LoginForm({
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 rounded-md"
+              className="h-10 rounded-md"
             />
           </div>
         )}
@@ -90,13 +90,13 @@ export function LoginForm({
         {error && (
           <p
             role="alert"
-            className="border border-[color:var(--down)]/30 bg-[color:var(--down)]/5 px-3 py-2 font-mono text-xs text-[color:var(--down)]"
+            className="callout-error"
           >
             {error}
           </p>
         )}
 
-        <Button type="submit" disabled={loading} className="h-11 w-full">
+        <Button type="submit" disabled={loading} className="h-10 w-full">
           {loading
             ? mode === "password"
               ? "Signing in…"

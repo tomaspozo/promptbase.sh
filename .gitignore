@@ -41,8 +41,15 @@ agentlink-debug.log
 # Agent Link — database backups (may contain sensitive data)
 supabase/backups/
 
+# Deno lockfiles in edge functions — the Supabase edge runtime bundles an older
+# Deno that can't read newer lockfile versions; `deno check` shouldn't leave them.
+supabase/functions/**/deno.lock
+
 # agent skills
 */skills/**
+
+# planning docs (local only)
+/plans/
 
 # typescript
 *.tsbuildinfo

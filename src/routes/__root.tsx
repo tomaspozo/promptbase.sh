@@ -44,7 +44,10 @@ export const Route = createRootRoute({
           "Version-controlled system prompts and message templates that run in your own Supabase — easily editable by your team.",
       },
     ],
-    links: [{ rel: "stylesheet", href: globalCss }],
+    links: [
+      { rel: "stylesheet", href: globalCss },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+    ],
   }),
   notFoundComponent: NotFound,
   component: RootComponent,

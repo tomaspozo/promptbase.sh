@@ -56,17 +56,10 @@ BEGIN
 END;
 $$;
 
--- @agentlink api.tenant_list
--- @type function
--- @summary Lists all tenants the current user belongs to
--- @description SECURITY INVOKER. Returns a JSON array of tenants with the user's
---   role in each. Relies on the users_read_own_memberships RLS policy to expose
---   the caller's memberships across tenants (the tenant-scoped policy alone would
---   only show memberships in the currently selected tenant).
--- @signature api.tenant_list()
--- @returns jsonb
--- @security SECURITY INVOKER — RLS applies
--- @related tenants, memberships, users_read_own_memberships
+-- PROJECT-OWNED OVERRIDE (no @agentlink annotation): extends the scaffold's
+-- tenant_list with promptbase's organization_id + plan (drives /prompting
+-- routing and onboarding gating). Lists all tenants the caller belongs to with
+-- their role; SECURITY INVOKER, RLS applies (users_read_own_memberships).
 CREATE OR REPLACE FUNCTION api.tenant_list()
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -80,8 +73,10 @@ BEGIN
     'id', t.id,
     'name', t.name,
     'slug', t.slug,
-    'role', m.role
-  )), '[]'::jsonb)
+    'role', m.role,
+    'organization_id', t.organization_id,
+    'plan', t.plan
+  ) ORDER BY t.created_at), '[]'::jsonb)
   INTO v_result
   FROM public.memberships m
   JOIN public.tenants t ON t.id = m.tenant_id
@@ -91,18 +86,12 @@ BEGIN
 END;
 $$;
 
--- @agentlink api.tenant_create
--- @type function
--- @summary Creates a new tenant with the current user as owner and pins it to the session
--- @description SECURITY INVOKER. Delegates the atomic multi-row write
---   (tenant + owner membership) to public._internal_admin_create_tenant, then
---   pins the new tenant to the caller's current session via
---   _internal_admin_set_session_tenant so a single supabase.auth.refreshSession()
---   on the client lands them inside the new workspace.
--- @signature api.tenant_create(p_name text, p_slug text)
--- @returns jsonb
--- @security SECURITY INVOKER — privileged work delegated to _internal_admin_*
--- @related tenants, memberships, session_tenants, api.tenant_select, _internal_admin_create_tenant
+-- PROJECT-OWNED OVERRIDE (no @agentlink annotation): adds plan gating to the
+-- scaffold's tenant_create. Free accounts may own a single workspace; owning a
+-- Pro workspace lifts the cap. Otherwise identical to the scaffold — delegates
+-- the atomic tenant + owner-membership write to _internal_admin_create_tenant
+-- and pins the new tenant to the session so one refreshSession() lands the
+-- caller inside it.
 CREATE OR REPLACE FUNCTION api.tenant_create(p_name text, p_slug text)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -112,9 +101,24 @@ AS $$
 DECLARE
   v_user_id   uuid := (SELECT auth.uid());
   v_tenant_id uuid;
+  v_owned     int;
+  v_has_pro   boolean;
 BEGIN
   IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  -- Plan gate: count workspaces the caller owns and whether any is on a paid
+  -- plan. Free (no Pro workspace) is capped at one owned workspace.
+  SELECT count(*), COALESCE(bool_or(t.plan <> 'free'), false)
+    INTO v_owned, v_has_pro
+  FROM public.memberships m
+  JOIN public.tenants t ON t.id = m.tenant_id
+  WHERE m.user_id = v_user_id AND m.role = 'owner';
+
+  IF v_owned >= 1 AND NOT v_has_pro THEN
+    RAISE EXCEPTION 'Free plan includes 1 workspace. Upgrade to Pro to create more.'
+      USING ERRCODE = 'P0001', HINT = 'plan_limit';
   END IF;
 
   v_tenant_id := public._internal_admin_create_tenant(v_user_id, p_name, p_slug);

@@ -39,7 +39,7 @@ function CheckInboxPage() {
       navigate({ to: "/update-password" });
       return;
     }
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/app" });
   }
 
   function onBack() {

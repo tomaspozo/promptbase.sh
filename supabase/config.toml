@@ -46,7 +46,7 @@ enable_signup = true
 double_confirm_changes = true
 # Disabled on scaffold so the first local sign-up lands in the app without
 # needing SMTP. Set to true before shipping to production.
-enable_confirmations = false
+enable_confirmations = true
 # 8-digit email OTP. Matches the cloud auth config (mailer_otp_length) so the
 # verify-OTP flow behaves identically across local and deployed environments.
 otp_length = 8
@@ -82,5 +82,25 @@ enabled = true
 verify_jwt = false
 
 [functions.internal-send-approval-email]
+enabled = true
+verify_jwt = false
+
+# Platform functions called by the logged-in user's browser (auth: 'user').
+# verify_jwt MUST be false: withSupabase verifies the user JWT itself AND answers
+# the CORS preflight (OPTIONS carries no JWT, so verify_jwt=true would reject the
+# preflight at the gateway and the browser's functions.invoke would fail).
+[functions.supabase-oauth-callback]
+enabled = true
+verify_jwt = false
+
+[functions.management-projects]
+enabled = true
+verify_jwt = false
+
+[functions.environment-install]
+enabled = true
+verify_jwt = false
+
+[functions.prompts-proxy]
 enabled = true
 verify_jwt = false

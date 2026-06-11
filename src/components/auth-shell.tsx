@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PageHeading } from "@/components/page-heading";
 
 interface AuthShellProps {
   eyebrow: string;
@@ -39,9 +40,7 @@ export function AuthShell({
         </div>
 
         <div className="mt-12 animate-rise">
-          <h1 className="text-3xl font-medium tracking-[-0.02em] sm:text-4xl">
-            {title}
-          </h1>
+          <PageHeading>{title}</PageHeading>
           {subtitle ? (
             <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
           ) : null}

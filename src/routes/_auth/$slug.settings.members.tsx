@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Loading } from "@/components/loading";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -7,6 +8,8 @@ import { useHasPermission } from "@/hooks/use-has-permission";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { EmptyState } from "@/components/empty-state";
 import {
   Table,
   TableBody,
@@ -24,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
  * useHasPermission (UX only — the backend auth_verify_access() guard in each
  * RPC is the real gate).
  */
-export const Route = createFileRoute("/_auth/settings/members")({
+export const Route = createFileRoute("/_auth/$slug/settings/members")({
   beforeLoad: ({ context }) => {
     const perms = permissionsFromClaims(context.user);
     if (!hasPermissions(perms, ["membership.read"])) {
@@ -59,6 +62,11 @@ function MembersPage() {
   const [invitations, setInvitations] = useState<Invitation[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const canInvite = useHasPermission("invitation.create");
+  const canManageRoles = useHasPermission("membership.update");
+  const canRemove = useHasPermission("membership.delete");
+  const canManageMembers = canManageRoles || canRemove;
+
   async function refresh() {
     const supabase = createClient();
     const [m, i] = await Promise.all([
@@ -67,8 +75,9 @@ function MembersPage() {
     ]);
     if (m.error) setError(m.error.message);
     else setMembers(m.data as unknown as Member[]);
-    if (i.error) setError(i.error.message);
-    else setInvitations(i.data as unknown as Invitation[]);
+    // invitation_list is gated by invitation.create; plain members get a 403 we
+    // intentionally swallow (the invite UI is hidden for them anyway).
+    setInvitations(i.error ? [] : (i.data as unknown as Invitation[]));
   }
 
   useEffect(() => {
@@ -76,31 +85,20 @@ function MembersPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
-      <div className="rule pt-4">
-        <p className="label">Settings · Members</p>
-      </div>
+    <div className="animate-rise space-y-10">
+      <p className="text-sm text-muted-foreground">
+        {canManageMembers || canInvite
+          ? "Invite teammates, change roles, and remove access. Role changes take effect on the affected user's next sign-in."
+          : "Everyone with access to this workspace."}
+      </p>
 
-      <div className="mt-12 animate-rise space-y-12">
-        <header>
-          <h1 className="text-3xl font-medium tracking-[-0.02em] sm:text-4xl">
-            Workspace members
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Invite teammates, change roles, and remove access. Role changes
-            take effect on the affected user&apos;s next sign-in.
-          </p>
-        </header>
+      {error && (
+        <p role="alert" className="callout-error">
+          {error}
+        </p>
+      )}
 
-        {error && (
-          <p
-            role="alert"
-            className="border border-[color:var(--down)]/30 bg-[color:var(--down)]/5 px-3 py-2 font-mono text-xs text-[color:var(--down)]"
-          >
-            {error}
-          </p>
-        )}
-
+      {canInvite && (
         <section className="space-y-4">
           <h2 className="label">Invite</h2>
           <InviteForm
@@ -111,21 +109,17 @@ function MembersPage() {
             onError={setError}
           />
         </section>
+      )}
 
+      {canInvite && (
         <section className="space-y-4">
           <h2 className="label">Pending invitations</h2>
           {invitations === null ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <Loading />
           ) : invitations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/40 py-12 text-center">
-              <div className="mb-4 rounded-lg bg-muted p-4">
-                <Mail className="size-6 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-semibold">No pending invitations</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Invite teammates above to get started.
-              </p>
-            </div>
+            <EmptyState icon={Mail} title="No pending invitations">
+              Invite teammates above to get started.
+            </EmptyState>
           ) : (
             <Table>
               <TableHeader>
@@ -149,35 +143,40 @@ function MembersPage() {
             </Table>
           )}
         </section>
+      )}
 
-        <section className="space-y-4">
-          <h2 className="label">Members</h2>
-          {members === null ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Member</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
+      <section className="space-y-4">
+        <h2 className="label">Members</h2>
+        {members === null ? (
+          <Loading />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Member</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                {canManageMembers && (
                   <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {members.map((m) => (
-                  <MemberRow
-                    key={m.id}
-                    member={m}
-                    onChange={() => void refresh()}
-                    onError={setError}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </section>
-      </div>
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {members.map((m) => (
+                <MemberRow
+                  key={m.id}
+                  member={m}
+                  canManageRoles={canManageRoles}
+                  canRemove={canRemove}
+                  showActions={canManageMembers}
+                  onChange={() => void refresh()}
+                  onError={setError}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </section>
     </div>
   );
 }
@@ -227,7 +226,7 @@ function InviteForm({
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-11 rounded-md"
+          className="h-10 rounded-md"
         />
       </div>
       <div className="space-y-2">
@@ -240,7 +239,7 @@ function InviteForm({
         title={
           canInvite ? undefined : "You don't have permission to invite members"
         }
-        className="h-11"
+        className="h-10"
       >
         {loading ? "Inviting…" : "Send invite"}
       </Button>
@@ -312,16 +311,20 @@ function InvitationRow({
 
 function MemberRow({
   member,
+  canManageRoles,
+  canRemove,
+  showActions,
   onChange,
   onError,
 }: {
   member: Member;
+  canManageRoles: boolean;
+  canRemove: boolean;
+  showActions: boolean;
   onChange: () => void;
   onError: (msg: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
-  const canManageRoles = useHasPermission("membership.update");
-  const canRemove = useHasPermission("membership.delete");
 
   async function changeRole(role: string) {
     setBusy(true);
@@ -357,23 +360,27 @@ function MemberRow({
       <TableCell>{member.display_name ?? "—"}</TableCell>
       <TableCell className="font-mono text-sm">{member.email ?? "—"}</TableCell>
       <TableCell>
-        {member.role === "owner" ? (
-          <Badge>{member.role}</Badge>
+        {member.role === "owner" || !canManageRoles ? (
+          <Badge variant={member.role === "owner" ? "default" : "outline"}>
+            {member.role}
+          </Badge>
         ) : (
           <RoleSelect
             current={member.role}
             onChange={changeRole}
-            disabled={busy || !canManageRoles}
+            disabled={busy}
           />
         )}
       </TableCell>
-      <TableCell className="text-right">
-        {member.role !== "owner" && canRemove && (
-          <Button variant="ghost" size="sm" onClick={remove} disabled={busy}>
-            Remove
-          </Button>
-        )}
-      </TableCell>
+      {showActions && (
+        <TableCell className="text-right">
+          {member.role !== "owner" && canRemove && (
+            <Button variant="ghost" size="sm" onClick={remove} disabled={busy}>
+              Remove
+            </Button>
+          )}
+        </TableCell>
+      )}
     </TableRow>
   );
 }
@@ -390,18 +397,17 @@ function RoleSelect({
   disabled?: boolean;
 }) {
   return (
-    <select
+    <Select
       id={id}
       value={current}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className="h-11 rounded-md border border-input bg-background px-3 text-sm"
     >
       {ROLES.map((r) => (
         <option key={r} value={r}>
           {r}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }

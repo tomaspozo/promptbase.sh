@@ -146,6 +146,36 @@
     border-top: 1px solid var(--border);
   }
 
+  /* Editorial status notes — left accent bar + subtle tint + mono text. One
+     source of truth for the error/success/info boxes across the app. */
+  .callout {
+    border-left: 2px solid var(--border);
+    background: color-mix(in oklab, var(--muted) 60%, transparent);
+    padding: 0.5rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.55;
+    color: var(--muted-foreground);
+  }
+  .callout-error {
+    border-left: 2px solid var(--down);
+    background: color-mix(in oklab, var(--down) 7%, transparent);
+    padding: 0.5rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.55;
+    color: var(--down);
+  }
+  .callout-success {
+    border-left: 2px solid var(--up);
+    background: color-mix(in oklab, var(--up) 7%, transparent);
+    padding: 0.5rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.55;
+    color: var(--up);
+  }
+
   .rule-tick {
     position: relative;
   }

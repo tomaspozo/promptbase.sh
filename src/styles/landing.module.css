@@ -91,6 +91,29 @@
   color: var(--text-secondary);
 }
 
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navLogin {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-dm-sans), sans-serif;
+  color: var(--text);
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 0.5px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.navLogin:hover {
+  background: var(--bg-secondary);
+  border-color: var(--text-secondary);
+}
+
 /* HERO */
 .hero {
   max-width: var(--content-max);
@@ -434,6 +457,21 @@
 }
 
 .footerLinks a:hover {
+  color: var(--text);
+}
+
+.footerCredit {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.footerCredit a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footerCredit a:hover {
   color: var(--text);
 }
 

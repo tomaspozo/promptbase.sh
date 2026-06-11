@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PageHeading } from "@/components/page-heading";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { createClient } from "@/lib/supabase/client";
 import { isAllowedFromClaims } from "@/lib/permissions";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/pending")({
       throw redirect({ to: "/auth/sign-in" });
     }
     if (isAllowedFromClaims(context.user)) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: "/app" });
     }
   },
   component: PendingPage,
@@ -31,7 +32,7 @@ function PendingPage() {
 
   // Re-mint the token (picks up app_metadata.allowed if just approved) and
   // re-run route guards. If approved, this route's beforeLoad redirects to
-  // /dashboard; otherwise we stay here. No manual navigate (that would loop
+  // /app; otherwise we stay here. No manual navigate (that would loop
   // back through the _auth gate).
   async function checkStatus() {
     setChecking(true);
@@ -59,9 +60,7 @@ function PendingPage() {
         </div>
 
         <div className="mt-12 animate-rise">
-          <h1 className="text-3xl font-medium tracking-[-0.02em] sm:text-4xl">
-            You&rsquo;re on the list.
-          </h1>
+          <PageHeading>You&rsquo;re on the list.</PageHeading>
           <p className="mt-2 text-sm text-muted-foreground">
             Thanks for signing up — your email is verified and your account is
             waiting for approval. We&rsquo;ll email you the moment you&rsquo;re
@@ -69,7 +68,7 @@ function PendingPage() {
           </p>
 
           <div className="mt-8 flex items-center gap-3">
-            <Button onClick={checkStatus} disabled={checking} className="h-11">
+            <Button onClick={checkStatus} disabled={checking} className="h-10">
               {checking ? "Checking…" : "Check status"}
             </Button>
             {checkedOnce && !checking && (

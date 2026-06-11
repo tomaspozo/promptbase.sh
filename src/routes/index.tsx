@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Check, X, History, Variable, Database, Code } from "lucide-react";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { Wordmark } from "@/components/wordmark";
 import styles from "@/styles/landing.module.css";
 
 export const Route = createFileRoute("/")({
@@ -28,7 +29,7 @@ const FEATURES = [
   {
     icon: History,
     title: "Full version history",
-    desc: "Every change is tracked. Roll back to any previous version in one click.",
+    desc: "Every publish is a version. Roll back to any of them in one click.",
   },
   {
     icon: Variable,
@@ -58,10 +59,14 @@ function Home() {
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <Link className={styles.logo} to="/">
-            <div className={styles.logoDot} />
-            promptbase.sh
+            <Wordmark />
           </Link>
-          <span className={styles.navBadge}>open source · coming soon</span>
+          <div className={styles.navRight}>
+            <span className={styles.navBadge}>early access</span>
+            <Link className={styles.navLogin} to="/auth/sign-in">
+              Log in
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -89,15 +94,13 @@ function Home() {
           <span className={styles.stepNum}>01</span>
           <div>
             <p className={styles.stepTitle}>
-              Deploy to your Supabase in one command
+              Connect your Supabase — one click
             </p>
             <p className={styles.stepDesc}>
-              Run the init script. It creates the schema, deploys the edge
-              functions, and hands you the editor URL. Done in under a minute.
+              Sign in, authorize your Supabase organization, and pick a project.
+              We deploy the prompt store and edge functions into it for you — no
+              CLI, no migrations to run.
             </p>
-            <div className={styles.codeBlock}>
-              <span className={styles.kw}>npx</span> promptbase init
-            </div>
           </div>
         </div>
 
@@ -108,9 +111,9 @@ function Home() {
               Your team edits prompts — no GitHub needed
             </p>
             <p className={styles.stepDesc}>
-              Share the editor URL with your partner or content team. They edit
-              system prompts and message templates, publish new versions, and
-              roll back — all from a clean UI.
+              Invite your partner or content team. They edit system prompts and
+              message templates, publish new versions, and roll back — all from a
+              clean UI, right in promptbase.
             </p>
           </div>
         </div>
@@ -122,14 +125,15 @@ function Home() {
               Fetch at runtime, not at deploy time
             </p>
             <p className={styles.stepDesc}>
-              Pull the latest published version in your Node code. Changes go
+              Pull the latest published version from your own project. Changes go
               live instantly — no server restart, no redeploy.
             </p>
             <div className={styles.codeBlock}>
               <span className={styles.kw}>const</span> {"{ system, user } = "}
               <span className={styles.kw}>await</span> getPrompt(
-              <span className={styles.str}>&apos;onboarding-email&apos;</span>,{" {"}
-              {"\n"}  name: user.name,{"\n"}  product:{" "}
+              <span className={styles.str}>&apos;onboarding-email&apos;</span>,
+              {" {"}
+              {"\n"} name: user.name,{"\n"} product:{" "}
               <span className={styles.str}>&apos;Acme&apos;</span>
               {"\n})"}
               {"\n\n"}
@@ -147,7 +151,9 @@ function Home() {
         <p className={styles.sectionLabel}>what it is / what it&apos;s not</p>
         <div className={styles.scopeGrid}>
           <div>
-            <p className={`${styles.scopeColTitle} ${styles.yes}`}>what it is</p>
+            <p className={`${styles.scopeColTitle} ${styles.yes}`}>
+              what it is
+            </p>
             {SCOPE_IS.map((item) => (
               <div className={styles.scopeItem} key={item}>
                 <Check className={styles.yes} />
@@ -191,23 +197,25 @@ function Home() {
 
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
-          <span className={styles.footerLogo}>promptbase.sh</span>
-          <div className={styles.footerLinks}>
+          <Wordmark className={styles.footerLogo} />
+          <p className={styles.footerCredit}>
+            Built by{" "}
             <a
-              href="https://github.com"
+              href="https://x.com/tomaspozo"
               target="_blank"
               rel="noopener noreferrer"
             >
-              GitHub
-            </a>
+              tomaspozo
+            </a>{" "}
+            with{" "}
             <a
-              href="https://supabase.com"
+              href="https://agentlink.sh"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Supabase
+              agentlink.sh
             </a>
-          </div>
+          </p>
         </div>
       </footer>
     </div>

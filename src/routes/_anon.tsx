@@ -8,7 +8,7 @@ import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/_anon")({
   beforeLoad: ({ context }) => {
     if (context.user) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: "/app" });
     }
   },
   component: () => <Outlet />,

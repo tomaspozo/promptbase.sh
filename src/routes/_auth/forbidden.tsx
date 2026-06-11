@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { PageHeading } from "@/components/page-heading";
 import { ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -13,19 +14,17 @@ export const Route = createFileRoute("/_auth/forbidden")({
 function ForbiddenPage() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center px-6 py-24 text-center">
-      <div className="mb-4 rounded-2xl bg-muted p-4">
-        <ShieldAlert className="size-8 text-muted-foreground" />
+      <div className="mb-5 grid size-12 place-items-center rounded-xl bg-[color:var(--down)]/10 text-[color:var(--down)]">
+        <ShieldAlert className="size-6" />
       </div>
-      <h1 className="text-2xl font-medium tracking-[-0.02em]">
-        You don&apos;t have access
-      </h1>
+      <PageHeading>You don&apos;t have access</PageHeading>
       <p className="mt-2 max-w-prose text-sm text-muted-foreground">
         Your role in this workspace doesn&apos;t grant permission to view this
         page. Ask an admin to update your role, or switch to a workspace where
         you have access.
       </p>
       <Button asChild className="mt-6">
-        <Link to="/dashboard">Back to dashboard</Link>
+        <Link to="/app">Back to app</Link>
       </Button>
     </div>
   );

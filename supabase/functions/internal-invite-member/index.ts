@@ -26,7 +26,7 @@ interface InvitePayload {
 export default {
   fetch: withSupabase(
     { auth: "secret", supabaseOptions: { db: { schema: "api" } } },
-    async (req, { supabaseAdmin }) => {
+    async (req) => {
       if (req.method !== "POST") {
         return new Response("Method not allowed", { status: 405 });
       }
@@ -45,29 +45,24 @@ export default {
       }
 
       const resend = new Resend(resendApiKey);
-      const directUrl = `${appUrl}/accept-invite?token=${token}`;
 
-      let inviteUrl: string;
-
-      // Try to create user via Auth admin API (for new users).
-      // generateLink sets invited_at on auth.users, which prevents
-      // _internal_admin_handle_new_user from creating a default tenant.
-      const { data: linkData, error: linkError } =
-        await supabaseAdmin.auth.admin.generateLink({
-          type: "invite",
-          email,
-          options: {
-            redirectTo: directUrl,
-          },
-        });
-
-      if (!linkError && linkData?.properties?.action_link) {
-        // New user — use the Auth verification link (creates session on click)
-        inviteUrl = linkData.properties.action_link;
-      } else {
-        // Existing user — use direct link (they'll log in if needed)
-        inviteUrl = directUrl;
-      }
+      // Always send the token-based accept link — never pre-create the user.
+      //
+      // We deliberately do NOT call supabaseAdmin.auth.admin.generateLink({
+      // type: "invite" }) anymore: it created a brand-new auth.users row the
+      // instant the owner sent the invite (with invited_at set). The invitee
+      // then "already existed" and could never sign up ("An account with this
+      // email already exists"), and the account showed up in the dashboard
+      // before they ever accepted.
+      //
+      // The invite flow is signup-based instead: the recipient clicks this
+      // link → /accept-invite → "Create an account" → signUp() (invited_at
+      // stays NULL). public._internal_admin_handle_new_user sees the pending
+      // invitation for their email and skips personal-tenant creation; after
+      // they confirm + sign in, /accept-invite calls api.invitation_accept to
+      // join the workspace. Existing users just sign in and accept. Either way
+      // the auth user is created on SIGNUP, not on invite.
+      const inviteUrl = `${appUrl}/accept-invite?token=${token}`;
 
       // Render and send the branded email
       const element = React.createElement(TeamInviteEmail, {
