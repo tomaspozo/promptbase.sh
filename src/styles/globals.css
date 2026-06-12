@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* promptbase brand type — DM Sans body, DM Mono labels/code (matches the
-     landing). Self-hosted via @fontsource (imported in src/routes/__root.tsx). */
+  /* promptbase brand type — DM Sans body, DM Mono labels/code.
+     Self-hosted via @fontsource (imported in src/routes/__root.tsx). */
   --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
@@ -49,11 +49,7 @@
 }
 
 :root {
-  /* Landing brand fonts (consumed by src/styles/landing.module.css) */
-  --font-dm-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --font-dm-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
-
-  /* promptbase brand — warm paper + green primary (matches the landing) */
+  /* promptbase brand — warm paper + violet primary */
   --background: #ffffff;
   --foreground: #1a1a18;
   --card: #ffffff;
@@ -61,7 +57,7 @@
   --popover: #ffffff;
   --popover-foreground: #1a1a18;
 
-  --primary: #1d9e75; /* brand green */
+  --primary: #7c3aed; /* brand violet */
   --primary-foreground: #ffffff;
   --secondary: #f6f6f4;
   --secondary-foreground: #1a1a18;
@@ -79,7 +75,7 @@
   --destructive: var(--down);
   --border: #e7e6e1;
   --input: #d8d7d1;
-  --ring: #1d9e75;
+  --ring: #7c3aed;
 
   --radius: 0.625rem; /* 10px — rounded-md resolves to 8px, matching the landing */
 
@@ -91,7 +87,7 @@
 }
 
 .dark {
-  /* promptbase brand — warm dark paper + green primary (matches the landing) */
+  /* promptbase brand — warm dark paper + violet primary */
   --background: #1a1a18;
   --foreground: #f0efe8;
   --card: #242422;
@@ -99,7 +95,7 @@
   --popover: #242422;
   --popover-foreground: #f0efe8;
 
-  --primary: #1d9e75; /* brand green */
+  --primary: #8b5cf6; /* brand violet — lifted for the near-black dark bg */
   --primary-foreground: #ffffff;
   --secondary: #242422;
   --secondary-foreground: #f0efe8;
@@ -116,7 +112,7 @@
   --destructive: var(--down);
   --border: #2e2d2a;
   --input: #34332f;
-  --ring: #1d9e75;
+  --ring: #8b5cf6; /* lifted to match dark-mode primary */
 
   --chart-4: #8a8880;
   --chart-5: #6a6960;
