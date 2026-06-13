@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="promptbase.sh">
-  <!-- The brand dot — the *.sh family signature. Per-product color: this is
-       promptbase's violet (must match --brand in src/styles/globals.css). -->
+  <!-- The brand dot: the *.sh family signature. Per-product color; this is
+       promptbase's violet (keep in sync with the brand token in globals.css). -->
   <circle cx="32" cy="32" r="20" fill="#7c3aed" />
 </svg>
