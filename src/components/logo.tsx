@@ -2,8 +2,9 @@ import { cn } from "@/lib/utils";
 
 /**
  * promptbase.sh mark — the wordmark's "p" in DM Mono (the brand mono face) plus
- * the brand green dot: "p." The "p" inherits the surrounding text color
- * (currentColor); the dot is always brand green. Size it with a text-size class.
+ * the brand dot: "p." The "p" inherits the surrounding text color
+ * (currentColor); the dot is always the brand accent (--primary). Size it with
+ * a text-size class.
  *
  *   <Logo className="text-2xl" />                 // size via font-size
  *   <Logo className="text-xl text-foreground" />  // explicit color

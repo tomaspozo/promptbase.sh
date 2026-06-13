@@ -49,6 +49,17 @@
 }
 
 :root {
+  /* ────────────────────────────────────────────────────────────────────
+     BRAND ACCENT — the ONLY thing that differs across the *.sh product
+     family. Each tool (promptbase, secrets, …) sets just these two hexes;
+     everything below is the shared chassis. --brand is tuned for the light
+     paper bg; --brand-lift is lifted for the deep dark bg (see .dark).
+
+       promptbase = violet
+     ──────────────────────────────────────────────────────────────────── */
+  --brand: #7c3aed; /* light-bg accent */
+  --brand-lift: #8b5cf6; /* dark-bg accent (lifted for contrast) */
+
   /* promptbase brand — warm paper + violet primary */
   --background: #ffffff;
   --foreground: #1a1a18;
@@ -57,7 +68,7 @@
   --popover: #ffffff;
   --popover-foreground: #1a1a18;
 
-  --primary: #7c3aed; /* brand violet */
+  --primary: var(--brand);
   --primary-foreground: #ffffff;
   --secondary: #f6f6f4;
   --secondary-foreground: #1a1a18;
@@ -75,7 +86,7 @@
   --destructive: var(--down);
   --border: #e7e6e1;
   --input: #d8d7d1;
-  --ring: #7c3aed;
+  --ring: var(--brand);
 
   --radius: 0.625rem; /* 10px — rounded-md resolves to 8px, matching the landing */
 
@@ -87,32 +98,33 @@
 }
 
 .dark {
-  /* promptbase brand — warm dark paper + violet primary */
-  --background: #1a1a18;
-  --foreground: #f0efe8;
-  --card: #242422;
-  --card-foreground: #f0efe8;
-  --popover: #242422;
-  --popover-foreground: #f0efe8;
+  /* promptbase brand — deep cool near-black + violet primary.
+     Backgrounds run darker & slightly cool so the brand accent pops. */
+  --background: #0c0c0f;
+  --foreground: #f3f2f5;
+  --card: #15151a;
+  --card-foreground: #f3f2f5;
+  --popover: #15151a;
+  --popover-foreground: #f3f2f5;
 
-  --primary: #8b5cf6; /* brand violet — lifted for the near-black dark bg */
+  --primary: var(--brand-lift); /* lifted brand accent for the near-black dark bg */
   --primary-foreground: #ffffff;
-  --secondary: #242422;
-  --secondary-foreground: #f0efe8;
-  --muted: #242422;
-  --muted-foreground: #a8a79f;
-  --accent: #2d2c29;
-  --accent-foreground: #f0efe8;
+  --secondary: #15151a;
+  --secondary-foreground: #f3f2f5;
+  --muted: #15151a;
+  --muted-foreground: #9a9aa6;
+  --accent: #1f1f26;
+  --accent-foreground: #f3f2f5;
 
   --up: #1d9e75;
   --mid: #c98a2e;
   --down: #e24b4a;
-  --none: #2a2a28;
+  --none: #1a1a20;
 
   --destructive: var(--down);
-  --border: #2e2d2a;
-  --input: #34332f;
-  --ring: #8b5cf6; /* lifted to match dark-mode primary */
+  --border: #262630;
+  --input: #2c2c37;
+  --ring: var(--brand-lift); /* matches dark-mode primary */
 
   --chart-4: #8a8880;
   --chart-5: #6a6960;

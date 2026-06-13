@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
 /**
- * The "promptbase.sh" wordmark with the brand-green period. Use anywhere the
+ * The "promptbase.sh" wordmark with the brand-accent period. Use anywhere the
  * brand name appears as text. Inherits font + color from context; only the dot
- * is green.
+ * is colored (--primary).
  */
 export function Wordmark({ className }: { className?: string }) {
   return (
