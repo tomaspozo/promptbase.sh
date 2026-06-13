@@ -1,74 +1,80 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Check, X, History, Variable, Database, Code } from "lucide-react";
+import { History, Variable, Database, Code } from "lucide-react";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { PromptArtifact } from "@/components/prompt-artifact";
 import { Wordmark } from "@/components/wordmark";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const SCOPE_IS = [
-  "System prompt management",
-  "User message templates",
-  "Variable interpolation",
-  "Version history & rollback",
-  "Easily editable by your team",
-  "Runs on your own Supabase",
-];
-
-const SCOPE_NOT = [
-  "An observability platform",
-  "An evals framework",
-  "A conversation manager",
-  "A tool/function registry",
-  "Another Langfuse",
+/** The product lifecycle — three real verbs, not decorative 01/02/03. */
+const LIFECYCLE = [
+  {
+    verb: "install",
+    body: "Authorize Supabase once. We add a prompt schema and two edge functions to your project — that's the whole footprint. Your prompts live in your database; we never store a copy.",
+    spotlight: false,
+  },
+  {
+    verb: "edit",
+    body: "Invite your teammates — members write and publish prompts from a clean editor, saved straight to your Supabase. No pull request, no deploy, no waiting on an engineer.",
+    spotlight: true,
+  },
+  {
+    verb: "use",
+    body: "Drop the getPrompt helper into your app — or ask your agent to add it — and call it anywhere. It reads the published version directly from your database, through your own edge function. Nothing routes through us.",
+    spotlight: false,
+  },
 ];
 
 const FEATURES = [
   {
     icon: History,
     title: "Full version history",
-    desc: "Every publish is a version. Roll back to any of them in one click.",
+    body: "Every publish is a version. Roll back to any of them in one click.",
   },
   {
     icon: Variable,
     title: "Variable interpolation",
-    desc: (
+    body: (
       <>
-        Use <code className="font-mono text-[11px]">{`{{variables}}`}</code> in
-        both system and user templates, pass values at runtime.
+        Use <code className="font-mono text-primary">{`{{variables}}`}</code> in
+        both system and user templates, filled with real values at runtime.
       </>
     ),
   },
   {
     icon: Database,
     title: "Your infra, always",
-    desc: "Runs entirely on your own Supabase project. No new vendors, no data leaving your stack.",
+    body: "Runs entirely on your own Supabase. No new vendors, no data leaving your stack.",
   },
   {
     icon: Code,
     title: "Any LLM, any framework",
-    desc: "Compatible with ai-sdk, OpenAI, Anthropic, and anything that accepts a plain string.",
+    body: "Works with ai-sdk, OpenAI, Anthropic, and anything that accepts a plain string.",
   },
 ];
 
+const eyebrow =
+  "font-mono text-[11px] uppercase tracking-[0.16em] text-primary";
 const sectionLabel =
-  "mb-8 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground/70";
+  "font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground/60";
 
 function Home() {
   return (
     <div className="min-h-screen bg-background font-sans text-foreground antialiased">
       {/* NAV */}
-      <nav className="border-b border-border px-8 py-5">
-        <div className="mx-auto flex max-w-[720px] items-center justify-between">
+      <nav className="border-b border-border">
+        <div className="mx-auto flex max-w-[900px] items-center justify-between px-6 py-5 sm:px-8">
           <Link
             to="/"
-            className="flex items-center gap-[7px] font-mono text-[15px] font-medium text-foreground"
+            className="font-mono text-[15px] font-medium text-foreground"
           >
             <Wordmark />
           </Link>
-          <div className="flex items-center gap-3">
-            <span className="rounded-full border border-border bg-secondary px-2.5 py-1 font-mono text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="hidden rounded-full border border-border bg-secondary px-2.5 py-1 font-mono text-[11px] text-muted-foreground sm:inline">
               early access
             </span>
             <Link
@@ -81,145 +87,87 @@ function Home() {
         </div>
       </nav>
 
-      {/* HERO */}
-      <div className="mx-auto max-w-[720px] px-8 pb-12 pt-20 text-center">
-        <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.1em] text-primary">
-          Prompt management you own
-        </p>
-        <h1 className="mb-5 font-mono text-[38px] leading-[1.1] tracking-[-0.02em] sm:text-[52px]">
-          Your prompts deserve
-          <br />
-          better than a <span className="text-primary">const</span>
-        </h1>
-        <p className="mx-auto mb-10 max-w-[440px] text-[17px] leading-[1.6] text-muted-foreground">
-          Version-controlled system prompts and message templates that run in
-          your own Supabase — easily editable by your team.
-        </p>
-
-        <WaitlistForm />
-      </div>
-
-      <hr className="mx-auto max-w-[720px] border-border" />
-
-      {/* HOW IT WORKS */}
-      <section className="mx-auto max-w-[720px] px-8 py-12">
-        <p className={sectionLabel}>how it works</p>
-
-        <div className="grid grid-cols-[32px_1fr] gap-4 border-b border-border py-5">
-          <span className="pt-0.5 font-mono text-xs text-muted-foreground/70">
-            01
-          </span>
+      {/* HERO — left thesis, right self-resolving artifact */}
+      <header className="mx-auto max-w-[900px] px-6 pb-16 pt-16 sm:px-8 sm:pt-20">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
           <div>
-            <p className="mb-1.5 text-[15px] font-medium">
-              Connect your Supabase — one click
+            <p className={eyebrow}>Prompt management you own</p>
+            <h1 className="mt-4 font-mono text-[34px] font-medium leading-[1.12] tracking-[-0.02em] sm:text-[44px]">
+              Your prompts shouldn&apos;t
+              <br className="hidden sm:block" /> be buried in code.
+            </h1>
+            <p className="mt-5 max-w-[440px] text-[17px] leading-[1.6] text-muted-foreground">
+              Edit your system prompts and message templates like documents,
+              version every change, and ship without a redeploy — all running in
+              your own Supabase.
             </p>
-            <p className="text-sm leading-[1.6] text-muted-foreground">
-              Sign in, authorize your Supabase organization, and pick a project.
-              We deploy the prompt store and edge functions into it for you — no
-              CLI, no migrations to run.
-            </p>
+            <div className="mt-8">
+              <WaitlistForm />
+            </div>
+          </div>
+
+          <div className="lg:pt-2">
+            <PromptArtifact />
           </div>
         </div>
+      </header>
 
-        <div className="grid grid-cols-[32px_1fr] gap-4 border-b border-border py-5">
-          <span className="pt-0.5 font-mono text-xs text-muted-foreground/70">
-            02
-          </span>
-          <div>
-            <p className="mb-1.5 text-[15px] font-medium">
-              Your team edits prompts — no GitHub needed
-            </p>
-            <p className="text-sm leading-[1.6] text-muted-foreground">
-              Invite your partner or content team. They edit system prompts and
-              message templates, publish new versions, and roll back — all from
-              a clean UI, right in promptbase.
-            </p>
-          </div>
-        </div>
+      <hr className="mx-auto max-w-[900px] border-border" />
 
-        <div className="grid grid-cols-[32px_1fr] gap-4 py-5">
-          <span className="pt-0.5 font-mono text-xs text-muted-foreground/70">
-            03
-          </span>
-          <div>
-            <p className="mb-1.5 text-[15px] font-medium">
-              Fetch at runtime, not at deploy time
-            </p>
-            <p className="text-sm leading-[1.6] text-muted-foreground">
-              Pull the latest published version from your own project. Changes
-              go live instantly — no server restart, no redeploy.
-            </p>
-            <pre className="mt-2.5 overflow-x-auto whitespace-pre rounded-md border border-border bg-secondary px-3.5 py-3 font-mono text-xs leading-[1.8] text-muted-foreground">
-              <span className="text-primary">const</span> {"{ system, user } = "}
-              <span className="text-primary">await</span> getPrompt(
-              <span className="text-mid">&apos;onboarding-email&apos;</span>
-              {", {"}
-              {"\n"}  name: user.name,{"\n"}  product:{" "}
-              <span className="text-mid">&apos;Acme&apos;</span>
-              {"\n})"}
-              {"\n\n"}
-              <span className="text-muted-foreground/60">
-                {"// works with ai-sdk, OpenAI, Anthropic, or raw fetch"}
+      {/* LIFECYCLE — connect / edit / fetch */}
+      <section className="mx-auto max-w-[900px] px-6 py-14 sm:px-8">
+        <p className={sectionLabel}>Setup to runtime</p>
+        <div className="mt-8 space-y-1">
+          {LIFECYCLE.map((step) => (
+            <div
+              key={step.verb}
+              className={`grid grid-cols-[84px_1fr] items-baseline gap-4 rounded-lg px-3 py-4 sm:grid-cols-[120px_1fr] ${
+                step.spotlight ? "bg-primary/[0.05]" : ""
+              }`}
+            >
+              <span className="font-mono text-sm text-primary">
+                {step.verb}
               </span>
-            </pre>
-          </div>
+              <p
+                className={`text-[15px] leading-[1.6] ${
+                  step.spotlight ? "text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                {step.body}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      <hr className="mx-auto max-w-[720px] border-border" />
+      <hr className="mx-auto max-w-[900px] border-border" />
 
-      {/* SCOPE */}
-      <section className="mx-auto max-w-[720px] px-8 py-12">
-        <p className={sectionLabel}>what it is / what it&apos;s not</p>
-        <div className="grid grid-cols-1 gap-6 rounded-xl border border-border bg-secondary px-6 py-5 sm:grid-cols-2">
-          <div>
-            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.08em] text-primary">
-              what it is
-            </p>
-            {SCOPE_IS.map((item) => (
-              <div
-                key={item}
-                className="mb-2 flex items-start gap-2 text-[13px] leading-[1.4] text-muted-foreground"
-              >
-                <Check className="mt-px size-3.5 shrink-0 text-primary" />
-                {item}
-              </div>
-            ))}
-          </div>
-          <div>
-            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.08em] text-down">
-              what it&apos;s not
-            </p>
-            {SCOPE_NOT.map((item) => (
-              <div
-                key={item}
-                className="mb-2 flex items-start gap-2 text-[13px] leading-[1.4] text-muted-foreground"
-              >
-                <X className="mt-px size-3.5 shrink-0 text-down" />
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* SCOPE — one declarative statement */}
+      <section className="mx-auto max-w-[900px] px-6 py-14 sm:px-8">
+        <p className={sectionLabel}>Scope</p>
+        <p className="mt-6 max-w-[620px] text-[19px] leading-[1.55]">
+          Prompt storage, versioning, and runtime delivery.{" "}
+          <span className="text-muted-foreground">
+            That&apos;s the whole job. Not an observability platform, not an
+            evals framework, not a conversation manager — not another Langfuse.
+          </span>
+        </p>
       </section>
 
-      <hr className="mx-auto max-w-[720px] border-border" />
+      <hr className="mx-auto max-w-[900px] border-border" />
 
-      {/* FEATURES */}
-      <section className="mx-auto max-w-[720px] px-8 pb-14 pt-12">
-        <p className={sectionLabel}>features</p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {/* FEATURES — scannable spec list, plain labels */}
+      <section className="mx-auto max-w-[900px] px-6 py-14 sm:px-8">
+        <p className={sectionLabel}>Features</p>
+        <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {FEATURES.map((feat) => {
             const Icon = feat.icon;
             return (
-              <div
-                key={feat.title}
-                className="rounded-xl bg-secondary px-5 py-4"
-              >
-                <Icon className="mb-2 size-[18px] text-primary" />
-                <p className="mb-1 text-sm font-medium">{feat.title}</p>
-                <p className="text-[13px] leading-[1.5] text-muted-foreground">
-                  {feat.desc}
+              <div key={feat.title} className="rounded-xl bg-secondary p-5">
+                <Icon className="mb-3 size-[18px] text-primary" />
+                <p className="mb-1.5 text-[15px] font-medium">{feat.title}</p>
+                <p className="text-[13.5px] leading-[1.55] text-muted-foreground">
+                  {feat.body}
                 </p>
               </div>
             );
@@ -228,29 +176,32 @@ function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-border px-8 py-5">
-        <div className="mx-auto flex max-w-[720px] items-center justify-between">
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-[900px] items-center justify-between px-6 py-5 sm:px-8">
           <Wordmark className="font-mono text-[13px] text-muted-foreground/70" />
-          <p className="text-[13px] text-muted-foreground/70">
-            Built by{" "}
-            <a
-              href="https://x.com/tomaspozo"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              tomaspozo
-            </a>{" "}
-            with{" "}
-            <a
-              href="https://agentlink.sh"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              agentlink.sh
-            </a>
-          </p>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <p className="text-[13px] text-muted-foreground/70">
+              Built by{" "}
+              <a
+                href="https://x.com/tomaspozo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                tomaspozo
+              </a>{" "}
+              with{" "}
+              <a
+                href="https://agentlink.sh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                agentlink.sh
+              </a>
+            </p>
+            <ThemeSwitcher />
+          </div>
         </div>
       </footer>
     </div>

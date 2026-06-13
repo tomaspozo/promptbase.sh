@@ -55,12 +55,12 @@
      everything below is the shared chassis. --brand is tuned for the light
      paper bg; --brand-lift is lifted for the deep dark bg (see .dark).
 
-       promptbase = violet
+       promptbase = cyan
      ──────────────────────────────────────────────────────────────────── */
-  --brand: #7c3aed; /* light-bg accent */
-  --brand-lift: #8b5cf6; /* dark-bg accent (lifted for contrast) */
+  --brand: #0891b2; /* light-bg accent */
+  --brand-lift: #22d3ee; /* dark-bg accent (lifted for contrast) */
 
-  /* promptbase brand — warm paper + violet primary */
+  /* promptbase brand — warm paper + cyan primary */
   --background: #ffffff;
   --foreground: #1a1a18;
   --card: #ffffff;
@@ -69,7 +69,7 @@
   --popover-foreground: #1a1a18;
 
   --primary: var(--brand);
-  --primary-foreground: #ffffff;
+  --primary-foreground: #042a33; /* deep teal-ink — reads on the bright cyan fill */
   --secondary: #f6f6f4;
   --secondary-foreground: #1a1a18;
   --muted: #f6f6f4;
@@ -98,8 +98,8 @@
 }
 
 .dark {
-  /* promptbase brand — deep cool near-black + violet primary.
-     Backgrounds run darker & slightly cool so the brand accent pops. */
+  /* promptbase brand — deep cool near-black + cyan primary.
+     Backgrounds run darker & slightly cool so the cyan accent pops. */
   --background: #0c0c0f;
   --foreground: #f3f2f5;
   --card: #15151a;
@@ -108,7 +108,7 @@
   --popover-foreground: #f3f2f5;
 
   --primary: var(--brand-lift); /* lifted brand accent for the near-black dark bg */
-  --primary-foreground: #ffffff;
+  --primary-foreground: #042a33; /* deep teal-ink — reads on the bright cyan fill */
   --secondary: #15151a;
   --secondary-foreground: #f3f2f5;
   --muted: #15151a;

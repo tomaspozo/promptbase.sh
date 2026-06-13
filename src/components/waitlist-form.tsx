@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
  * Landing-page early-access entry point. Carries the typed email into the
  * sign-up form (which does the real validation). After sign-up + email
  * verification the user lands on /pending until an admin approves them.
+ *
+ * Left-aligned to sit in the document-style hero; width is controlled here.
  */
 export function WaitlistForm() {
   const navigate = useNavigate();
@@ -21,13 +23,13 @@ export function WaitlistForm() {
   }
 
   return (
-    <>
-      <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-2.5 py-1 text-xs text-muted-foreground">
-        <span className="size-1.5 animate-pulse rounded-full bg-primary" />
+    <div className="max-w-[420px]">
+      <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-2.5 py-1 text-xs text-muted-foreground">
+        <span className="size-1.5 animate-pulse rounded-full bg-primary motion-reduce:animate-none" />
         <span>Early access · approval required</span>
       </div>
 
-      <div className="mx-auto mb-4 flex max-w-[400px] flex-col gap-2 sm:flex-row">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           type="email"
           value={email}
@@ -43,9 +45,9 @@ export function WaitlistForm() {
         </Button>
       </div>
 
-      <p className="text-xs text-muted-foreground/70">
+      <p className="mt-3 text-xs text-muted-foreground/70">
         Sign up now — we&apos;ll email you once you&apos;re approved.
       </p>
-    </>
+    </div>
   );
 }
